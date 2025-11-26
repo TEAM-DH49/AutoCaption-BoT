@@ -1,13 +1,13 @@
 import pyrogram, os, asyncio
 
-try: app_id = int(os.environ.get("app_id", None))
-except Exception as app_id: print(f"⚠️ App ID Invalid {app_id}")
-try: api_hash = os.environ.get("api_hash", None)
-except Exception as api_id: print(f"⚠️ Api Hash Invalid {api_hash}")
-try: bot_token = os.environ.get("bot_token", None)
-except Exception as bot_token: print(f"⚠️ Bot Token Invalid {bot_token}")
-try: custom_caption = os.environ.get("custom_caption", "`{file_name}`")
-except Exception as custom_caption: print(f"⚠️ Custom Caption Invalid {custom_caption}")
+# --- YAHAN HUMNE TERA DATA FIX KAR DIYA HAI ---
+# Ab Settings ki zarurat nahi, ye direct chalega.
+app_id = 24526878
+api_hash = "8cf44b8723e10b16e7de441352c8a6f5"
+bot_token = "8417458619:AAGN__toEHkjMdflB0_f4mrniVnguxjGMiY"
+
+# Caption default set kar diya hai
+custom_caption = os.environ.get("custom_caption", "`{file_name}`")
 
 AutoCaptionBot = pyrogram.Client(
    name="AutoCaptionBot", api_id=app_id, api_hash=api_hash, bot_token=bot_token)
@@ -41,14 +41,17 @@ def about_callback(bot, update):
 
 @AutoCaptionBot.on_message(pyrogram.filters.channel)
 def edit_caption(bot, update: pyrogram.types.Message):
-  if os.environ.get("custom_caption"):
+  if custom_caption:
       motech, _ = get_file_details(update)
       try:
-          try: update.edit(custom_caption.format(file_name=motech.file_name))
+          try: 
+              update.edit(custom_caption.format(file_name=motech.file_name))
           except pyrogram.errors.FloodWait as FloodWait:
               asyncio.sleep(FloodWait.value)
-              update.edit(custom_caption.format(mote, file_name=motech.file_name))
-      except pyrogram.errors.MessageNotModified: pass 
+              # Maine yahan se 'mote' hata diya hai jo error de raha tha
+              update.edit(custom_caption.format(file_name=motech.file_name))
+      except pyrogram.errors.MessageNotModified: 
+          pass 
   else:
       return
     
@@ -62,11 +65,6 @@ def get_file_details(update: pyrogram.types.Message):
         "video",
         "video_note",
         "voice",
-        # "contact",
-        # "dice",
-        # "poll",
-        # "location",
-        # "venue",
         "sticker"
     ):
         obj = getattr(update, message_type)
